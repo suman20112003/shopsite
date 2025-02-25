@@ -13,16 +13,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // Stripe Secret Key f
 
 // Middleware
 app.use(express.json({ limit: '10mb' }));
-app.use(cors());
+app.use(cors("*"));
 
 // MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.log("NOT CONNECTED TO NETWORK", err));
+
 
 app.get('/', (req, res) => {
   res.json({ message: 'shopsite is running' });
@@ -51,7 +45,24 @@ app.post('/create-payment-intent', async (req, res) => {
 // Routes
 app.use('/', Routes);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server started at port no. ${PORT}`);
-});
+
+
+async function init(){
+  try{
+    await mongoose
+    .connect(process.env.MONGO_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    })
+    console.log("mongodb connected successfully");
+    
+    // Start server
+    app.listen(PORT, () => {
+      console.log(`Server started at port no. ${PORT}`);
+    });
+  }
+  catch(err){
+    console.log(err);
+  }
+}
+init();
